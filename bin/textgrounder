@@ -108,7 +108,8 @@ OPENGL_NATIVES="$TEXTGROUNDER_DIR/lib/opengl-natives/linux64"
 CP="$TEXTGROUNDER_DIR/target/classes:$SCALA_LIB:$JARS:$CLASSPATH"
 
 HADOOP_COMMAND="$HADOOP_BINARY jar $TEXTGROUNDER_DIR/target/textgrounder-assembly.jar"
-JAVA_COMMAND="$JAVA -Djava.library.path=$OPENGL_NATIVES $JAVA_MEMORY_OPT $JAVA_DEBUG_OPT $JAVA_MISC_OPT $TG_JAVA_OPT -classpath $CP"
+#JAVA_COMMAND="$JAVA -Djava.library.path=$OPENGL_NATIVES $JAVA_MEMORY_OPT $JAVA_DEBUG_OPT $JAVA_MISC_OPT $TG_JAVA_OPT -classpath $CP"
+JAVA_COMMAND="$JAVA $JAVA_MEMORY_OPT $JAVA_DEBUG_OPT $JAVA_MISC_OPT $TG_JAVA_OPT -classpath $CP"
 #Running Scala using Java currently works, and ensures that we will run
 #properly even if Scala isn't installed on the system or an older version
 #is installed. (Since we download our own Scala libraries.)
