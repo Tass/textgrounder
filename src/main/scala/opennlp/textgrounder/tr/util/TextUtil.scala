@@ -42,4 +42,31 @@ object TextUtil {
                  docAsArray.slice(tokIndex + 1, endIndex).map(_.getForm)).filterNot(stoplist(_))
   }
 
+  def getContext(docAsArray:Array[Token], tokIndex:Int, windowSize:Int): String = {
+    val startIndex = math.max(0, tokIndex - windowSize)
+    val endIndex = math.min(docAsArray.length, tokIndex + windowSize + 1)
+
+    (docAsArray.slice(startIndex, tokIndex).map(_.getOrigForm).mkString("", " ", "") +
+    " [["+docAsArray(tokIndex).getOrigForm+"]] " +
+    docAsArray.slice(tokIndex + 1, endIndex).map(_.getOrigForm).mkString("", " ", "")).trim
+  }
+
+  def getContext(docAsArray:Array[StoredToken], tokIndex:Int, windowSize:Int): String = {
+    val startIndex = math.max(0, tokIndex - windowSize)
+    val endIndex = math.min(docAsArray.length, tokIndex + windowSize + 1)
+
+    (docAsArray.slice(startIndex, tokIndex).map(_.getOrigForm).mkString("", " ", "") +
+    " [["+docAsArray(tokIndex).getOrigForm+"]] " +
+    docAsArray.slice(tokIndex + 1, endIndex).map(_.getOrigForm).mkString("", " ", "")).trim
+  }
+
+  def stripPunc(s: String): String = {
+    var toReturn = s.trim
+    while(toReturn.length > 0 && !Character.isLetterOrDigit(toReturn.charAt(0)))
+      toReturn = toReturn.substring(1)
+    while(toReturn.length > 0 && !Character.isLetterOrDigit(toReturn.charAt(toReturn.length-1)))
+      toReturn = toReturn.substring(0,toReturn.length()-1)
+    toReturn
+  }
+
 }

@@ -104,9 +104,11 @@ fi
 
 JARS="`echo $TEXTGROUNDER_DIR/lib/*.jar $TEXTGROUNDER_DIR/lib_managed/*/*.jar $TEXTGROUNDER_DIR/lib_managed/*/*/*.jar $TEXTGROUNDER_DIR/lib_managed/*/*/*/*.jar $TEXTGROUNDER_DIR/output/*.jar $TEXTGROUNDER_DIR/target/*.jar | tr ' ' ':'`"
 SCALA_LIB="$HOME/.sbt/boot/scala-2.9.2/lib/scala-library.jar"
+OPENGL_NATIVES="$TEXTGROUNDER_DIR/lib/opengl-natives/linux64"
 CP="$TEXTGROUNDER_DIR/target/classes:$SCALA_LIB:$JARS:$CLASSPATH"
 
 HADOOP_COMMAND="$HADOOP_BINARY jar $TEXTGROUNDER_DIR/target/textgrounder-assembly.jar"
+#JAVA_COMMAND="$JAVA -Djava.library.path=$OPENGL_NATIVES $JAVA_MEMORY_OPT $JAVA_DEBUG_OPT $JAVA_MISC_OPT $TG_JAVA_OPT -classpath $CP"
 JAVA_COMMAND="$JAVA $JAVA_MEMORY_OPT $JAVA_DEBUG_OPT $JAVA_MISC_OPT $TG_JAVA_OPT -classpath $CP"
 #Running Scala using Java currently works, and ensures that we will run
 #properly even if Scala isn't installed on the system or an older version
@@ -183,6 +185,7 @@ Commands for toponym resolution:
   resolve ...           run the toponomy resolver
   write-to-kml ...      write a resolved corpus to visualizable KML format
   eval ...              evaluated a resolved corpus against a gold corpus
+  viz ...               visualize a serialized corpus
 
 Commands for the Geolocate module:
 
@@ -271,6 +274,7 @@ else
     preprocess-labelprop) CLASS=$TGTRAPP.LabelPropPreproc;;
     write-to-kml) CLASS=$TGTRAPP.WriteCorpusToKML;;
     eval) CLASS=$TGTRAPP.EvaluateCorpus;;
+    viz) CLASS=$TGTRAPP.VisualizeCorpus;;
 
     # Commands in the Bayesian code (there are many more)
     rlda-convert-from) CLASS=$TGBAYESAPP.ConvertFromRegionModelFormat;;
