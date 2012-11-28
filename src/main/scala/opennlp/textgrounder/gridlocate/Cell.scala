@@ -155,6 +155,11 @@ abstract class GeoCell[Co](
   var most_popular_document: GeoDoc[Co] = _
   var mostpopdoc_links = 0
 
+  lazy val refiner: Option[RefineStrategy[Co]] = grid.refiner(this)
+
+  // All documents added to this cell, required for refinements.
+  var documents: scala.collection.mutable.HashSet[GeoDoc[Co]]
+
   /**
    * Return a string describing the location of the cell in its grid,
    * e.g. by its boundaries or similar.
@@ -240,6 +245,8 @@ abstract class GeoCell[Co](
    */
   def add_document(doc: GeoDoc[Co]) {
     assert(!finished)
+    // Apparently DocumentRememberingCell implements this, but how does it interface?
+    if (refiner.isDefined) documents += doc
     combined_dist.add_document(doc)
     if (doc.incoming_links != None &&
       doc.incoming_links.get > mostpopdoc_links) {
@@ -413,7 +420,8 @@ abstract class GeoGrid[Co](
       include.toSeq union cells.toSeq
   }
 
-  /*********************** Not meant to be overridden *********************/
+  // Use a refiner for better center position.
+  lazy val refiner: (GeoCell[Co] => Option[RefineStrategy[Co]]) = RefineStrategy[Co](table.driver.params.refine_method)(_)
   
   /* These are simply the sum of the corresponding counts
      `num_docs_for_word_dist` and `num_docs_for_links` of each individual

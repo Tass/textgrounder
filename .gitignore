@@ -18,6 +18,7 @@ project/boot
 lib_managed/
 data/models/*.bin
 data/gazetteers/*.zip
+.ensime/
 
 # C code generation
 *.o
