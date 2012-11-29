@@ -158,7 +158,7 @@ abstract class GeoCell[Co](
   lazy val refiner: Option[RefineStrategy[Co]] = grid.refiner(this)
 
   // All documents added to this cell, required for refinements.
-  var documents: scala.collection.mutable.HashSet[GeoDoc[Co]]
+  var documents = scala.collection.mutable.HashSet[GeoDoc[Co]]()
 
   /**
    * Return a string describing the location of the cell in its grid,
@@ -421,7 +421,7 @@ abstract class GeoGrid[Co](
   }
 
   // Use a refiner for better center position.
-  lazy val refiner: (GeoCell[Co] => Option[RefineStrategy[Co]]) = RefineStrategy[Co](table.driver.params.refine_method)(_)
+  lazy val refiner: (GeoCell[Co] => Option[RefineStrategy[Co]]) = RefineStrategy[Co](GridLocateDriver.Params.refine_method)(_)
   
   /* These are simply the sum of the corresponding counts
      `num_docs_for_word_dist` and `num_docs_for_links` of each individual

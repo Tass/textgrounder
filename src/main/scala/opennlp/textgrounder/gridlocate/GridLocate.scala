@@ -427,10 +427,10 @@ class AverageCellProbabilityStrategy[Co](
 // the document location
 
 class RecursiveKdTree[Co](
-  val cell: GeoCell[Co]
+  cell: GeoCell[Co]
 ) extends RefineStrategy[Co](cell) {
   lazy val kdtree: KdTreeGrid = {
-    val params = cell.grid.table.driver.params
+    val params = GridLocateDriver.Params // eliminate in due time
     val tree = cell.documents.foldLeft(KdTreeGrid(
             // let's hope it doesn't have state
             cell.grid.table.asInstanceOf[SphereDocumentTable],
@@ -438,7 +438,7 @@ class RecursiveKdTree[Co](
             params.refine_kd_split_method,
             params.refine_kd_use_backoff,
             params.refine_kd_interpolate_weight
-          ))({case (doc, grid) => grid.add_document(doc); grid})
+          ))({case (grid, doc: SphereDocument) => grid.add_document_to_cell(doc); grid})
                 tree.initialize_cells
                 tree}
   override def refine_document(document: SphereDocument): SphereCoord = {
@@ -834,7 +834,7 @@ Used only when --strategy=average-cell-probability.""")
     ap.flag("test-kl",
       help = """If true, run both fast and slow KL-divergence variations and
 test to make sure results are the same.""")
-      
+
   //// Options used for refining
   var refine_method =
     ap.option[String]("refine-method", "rm", metavar = "REFINE_METHOD",
@@ -842,7 +842,7 @@ test to make sure results are the same.""")
       choices = Seq("none", "kd-tree"),
       help = """Chooses whether to refine the placement of a document
 with a cell.
-Default '%default'. Choice not implemented yet.""")
+Default '%default'.""")
 
   var refine_range =
     ap.option[String]("refine-range", "rr", metavar = "REFINE_RANGE",
@@ -853,32 +853,33 @@ should take documents into account.
 Default '%default'. Not implemented yet.""")
 
   var refine_kd_bucket_size =
-    ap.option[Int]("refine-kd-bucket-size", default = kd_bucket_size / 10,
+    ap.option[Int]("refine-kd-bucket-size", default = 20,
       metavar = "INT",
       help =
         """Bucket size before splitting a leaf into two children when
 refining.
-Defaults to one tenth of the initial tree. """ )
+Defaults to '%default'.""" )
 
   var refine_kd_split_method =
     ap.option[String]("refine-kd-split-method", metavar = "SPLIT_METHOD",
-      default = refine_kd_split_method,
+      default = "halfway",
       choices = Seq("halfway", "median", "maxmargin"),
       help = """Chooses which leaf-splitting method to use. Valid options are
 'halfway', which splits into two leaves of equal degrees, 'median', which
 splits leaves to have an equal number of documents, and 'maxmargin',
 which splits at the maximum margin between two points. All splits are always
-on the longest dimension. Defaults to same as the inital tree.""")
+on the longest dimension. Defaults to '%default'.""")
 
   var refine_kd_use_backoff =
     ap.flag("refine-kd-backoff", "refine-kd-use-backoff",
       help = """Specifies if we should back off to larger cell distributions.""")
 
   var refine_kd_interpolate_weight =
-    ap.option[Double]("kd-interpolate-weight", default = kd_interpolate_weight,
+    ap.option[Double]("kd-interpolate-weight", default = 0.0,
       help = """Specifies the weight given to parent distributions.
-Defaults to the same weight as the initial tree.""")
+Default value '%default' means no interpolation is used.""")
 
+      
   //// Debugging/output options
   var max_time_per_stage =
     ap.option[Double]("max-time-per-stage", "mts", metavar = "SECONDS",
