@@ -135,9 +135,7 @@ abstract class GridLocateDocumentStrategy[Co](
 abstract class RefineStrategy[Co](
   val cell: GeoCell[Co]
 ) {
-  // This should be GeoDoc[Co] and Co, but KdTree is for the sphere
-  // only. Ugly. But I don't feel like refactoring KdTree.
-  def refine_document(document: SphereDocument): SphereCoord
+  def refine(document: GeoDoc[Co]): SphereCoord
 }
 
 object RefineStrategy {
@@ -441,8 +439,11 @@ class RecursiveKdTree[Co](
           ))({case (grid, doc: SphereDocument) => grid.add_document_to_cell(doc); grid})
                 tree.initialize_cells
                 tree}
-  override def refine_document(document: SphereDocument): SphereCoord = {
-    kdtree.find_best_cell_for_document(document, true).get_center_coord
+
+  override def refine(document: GeoDoc[Co]): Co = {
+  // This should be GeoDoc[Co] and Co, but KdTree is for the sphere
+  // only. Ugly. But I don't feel like refactoring KdTree.
+    kdtree.find_best_cell_for_document(document.asInstanceOf[SphereDocument], true).get_center_coord.asInstanceOf[Co]
   }
 }
 

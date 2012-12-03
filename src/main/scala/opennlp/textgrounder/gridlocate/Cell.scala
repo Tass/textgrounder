@@ -180,6 +180,11 @@ abstract class GeoCell[Co](
    * central.
    */
   def get_center_coord(): Co
+  
+  // Predict where in or around the cell the document is.
+  def predict_coord[Co](document: GeoDoc[Co]): Co = {
+    refiner.map(_.refine(document)).getOrElse(get_center_coord)
+  }
 
   /**
    * Return true if we have finished creating and populating the cell.

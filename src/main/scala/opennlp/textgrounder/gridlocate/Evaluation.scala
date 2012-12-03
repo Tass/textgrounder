@@ -271,7 +271,7 @@ class RankedDocumentEvaluationResult[Co](
   val true_rank: Int
 ) extends DocumentEvaluationResult[Co](
   document, pred_cell.grid,
-  pred_cell.get_center_coord()
+  pred_cell.predict_coord(document)
 ) {
   override def record_result(stats: DocumentEvalStats) {
     super.record_result(stats)
@@ -825,7 +825,7 @@ class RankedGridEvaluator[Co](
     val kNNranks = pred_cells.take(num_nearest_neighbors).zipWithIndex.map {
       case ((cell, score), i) => (cell, i + 1) }.toMap
     val closest_half_with_dists =
-      kNN.map(n => (n, document.distance_to_coord(n.get_center_coord))).
+      kNN.map(n => (n, document.distance_to_coord(n.predict_coord(document)))).
         toSeq.sortWith(_._2 < _._2).take(num_nearest_neighbors/2)
 
     closest_half_with_dists.foreach {

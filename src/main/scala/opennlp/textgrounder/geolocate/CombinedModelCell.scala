@@ -48,7 +48,7 @@ class CombinedModelGrid(override val table: SphereDocumentTable,
         models.map(_.find_best_cell_for_document(doc, create_non_recorded))
               .filter(_ != null)
       candidates.minBy((cell: SphereCell) =>
-                         spheredist(cell.get_center_coord, doc.coord))
+                         spheredist(cell.predict_coord(doc), doc.coord))
   }
 
   def add_document_to_cell(document: SphereDocument) {

@@ -164,7 +164,7 @@ abstract class RectangularCell(
       val ne = get_northeast_coord()
       SphereCoord((sw.lat + ne.lat) / 2.0, (sw.long + ne.long) / 2.0)
     } else {
-      // use the centroid
+      // use the centroid TODO => refinement
       SphereCoord(centroid(0) / num_docs, centroid(1) / num_docs);
     }
   }
