@@ -135,7 +135,7 @@ abstract class GridLocateDocumentStrategy[Co](
 abstract class RefineStrategy[Co](
   val cell: GeoCell[Co]
 ) {
-  def refine(document: GeoDoc[Co]): SphereCoord
+  def refine(document: GeoDoc[Co]): Co
 }
 
 object RefineStrategy {
@@ -429,20 +429,26 @@ class RecursiveKdTree[Co](
 ) extends RefineStrategy[Co](cell) {
   lazy val kdtree: KdTreeGrid = {
     val params = GridLocateDriver.Params // eliminate in due time
-    val tree = cell.documents.foldLeft(KdTreeGrid(
+    val tree = KdTreeGrid(
             // let's hope it doesn't have state
             cell.grid.table.asInstanceOf[SphereDocumentTable],
             params.refine_kd_bucket_size,
             params.refine_kd_split_method,
             params.refine_kd_use_backoff,
-            params.refine_kd_interpolate_weight
-          ))({case (grid, doc: SphereDocument) => grid.add_document_to_cell(doc); grid})
-                tree.initialize_cells
-                tree}
+            params.refine_kd_interpolate_weight)
 
+    List(1,2).foreach(training_pass => {
+      tree.begin_training_pass(training_pass)
+      cell.documents.foreach(doc =>
+              tree.add_document_to_cell(doc.asInstanceOf[SphereDocument]))})
+
+    tree.initialize_cells
+    tree
+    }
+  
   override def refine(document: GeoDoc[Co]): Co = {
-  // This should be GeoDoc[Co] and Co, but KdTree is for the sphere
-  // only. Ugly. But I don't feel like refactoring KdTree.
+    // This should be GeoDoc[Co] and Co, but KdTree is for the sphere
+    // only. Ugly. But I don't feel like refactoring KdTree.
     kdtree.find_best_cell_for_document(document.asInstanceOf[SphereDocument], true).get_center_coord.asInstanceOf[Co]
   }
 }
