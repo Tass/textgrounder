@@ -135,7 +135,10 @@ abstract class GridLocateDocumentStrategy[Co](
 abstract class RefineStrategy[Co](
   val cell: GeoCell[Co]
 ) {
+  // Find a better coordinate within (or somewhere near) the cell
   def refine(document: GeoDoc[Co]): Co
+  // Which documents to use
+  def documents(): Iterable[GeoDoc[Co]] = cell.documents
 }
 
 object RefineStrategy {
@@ -439,7 +442,7 @@ class RecursiveKdTree[Co](
 
     List(1,2).foreach(training_pass => {
       tree.begin_training_pass(training_pass)
-      cell.documents.foreach(doc =>
+      documents.foreach(doc =>
               tree.add_document_to_cell(doc.asInstanceOf[SphereDocument]))})
 
     tree.initialize_cells
