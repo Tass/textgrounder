@@ -139,6 +139,7 @@ abstract class RefineStrategy[Co](
   def refine(document: GeoDoc[Co]): Co
   // Which documents to use
   def documents(): Iterable[GeoDoc[Co]] = cell.documents
+  val params = GridLocateDriver.Params // eliminate in due time
 }
 
 object RefineStrategy {
@@ -431,7 +432,6 @@ class RecursiveKdTree[Co](
   cell: GeoCell[Co]
 ) extends RefineStrategy[Co](cell) {
   lazy val kdtree: KdTreeGrid = {
-    val params = GridLocateDriver.Params // eliminate in due time
     val tree = KdTreeGrid(
             // let's hope it doesn't have state
             cell.grid.table.asInstanceOf[SphereDocumentTable],
@@ -885,11 +885,10 @@ on the longest dimension. Defaults to '%default'.""")
       help = """Specifies if we should back off to larger cell distributions.""")
 
   var refine_kd_interpolate_weight =
-    ap.option[Double]("kd-interpolate-weight", default = 0.0,
+    ap.option[Double]("refine-kd-interpolate-weight", default = 0.0,
       help = """Specifies the weight given to parent distributions.
 Default value '%default' means no interpolation is used.""")
 
-      
   //// Debugging/output options
   var max_time_per_stage =
     ap.option[Double]("max-time-per-stage", "mts", metavar = "SECONDS",

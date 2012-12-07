@@ -212,6 +212,10 @@ class DocumentEvaluationResult[Co](
    * coordinate and central point of true cell
    */
   val true_truedist = document.distance_to_coord(true_center)
+  // Distance from center of cell to predicted coordinate
+  val cell_truedist = true_cell.refiner.map (refiner =>
+    document.distance_to_coord(refiner.refine(document))
+  ) getOrElse true_truedist
   /**
    * "True distance" (rather than e.g. degree distance) between document's
    * coordinate and predicted coordinate
@@ -835,9 +839,8 @@ class RankedGridEvaluator[Co](
           document.output_distance(dist))
     }
 
-    errprint("%s:  Distance %s to true cell center at %s",
-      doctag, document.output_distance(result.true_truedist), result.true_center)
-    errprint("%s:  Distance %s to predicted cell center at %s",
+    errprint("%s:  Distance %s to true cell center at %s", doctag, document.output_distance(result.cell_truedist), result.true_center)
+    errprint("%s:  Distance %s to predicted coordinate at %s",
       doctag, document.output_distance(result.pred_truedist), result.pred_coord)
 
     val avg_dist_of_neighbors = mean(closest_half_with_dists.map(_._2))
